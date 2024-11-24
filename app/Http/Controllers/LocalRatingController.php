@@ -27,6 +27,7 @@ class LocalRatingController extends Controller
         $local->rating = $local->ratings()->avg('rating');
         $local->save();
 
+        // Si se ha guardado correctamente, redirigir al local con un mensaje de éxito
         return redirect()->route('local.show', ['localName' => $local->name])->with('success', 'Rating guardado con éxito');
     }
 }

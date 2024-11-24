@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import AjaxLoader from "../AjaxLoader";
 import { Link } from "@inertiajs/react";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
 const BeerCard = ({ beer }) => {
     const [loading, setLoading] = useState(true);
@@ -28,22 +29,22 @@ const BeerCard = ({ beer }) => {
                                 <AjaxLoader />
                             </div>
                         ) : (
-                            <img
+                            <LazyLoadImage
                                 src={beer.image}
                                 alt={beer.name}
-                                className="img-fluid rounded-circle"
+                                className="img-fluid "
                             />
                         )}
                     </div>
                     <h5 className="card-title">{beer.name}</h5>
                     <p className="card-text">
-                        <strong>Type:</strong> {beer.type}
+                        <strong>Tipo:</strong> {beer.type}
                     </p>
-                    <p className="card-text">
+                    {/* <p className="card-text">
                         <strong>Color:</strong> {beer.color}
-                    </p>
+                    </p> */}
                     <p className="card-text">
-                        <strong>Graduation:</strong> {beer.graduation}%
+                        <strong>Graduacion:</strong> {beer.graduation}%
                     </p>
                 </div>
             </div>

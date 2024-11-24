@@ -24,8 +24,9 @@ class BeerResource extends JsonResource
             'taste' => $this->taste,
             'type' => $this->type,
             'description' => $this->description,
-            'image' => $this->image && !(str_starts_with($this->image, 'http')) ?
-                Storage::url($this->image) : $this->image,
+            'image' => $this->image ?
+                (filter_var($this->image, FILTER_VALIDATE_URL) ? $this->image : Storage::url($this->image))
+                : null,
             'country' => $this->country,
             'city' => $this->city,
             'region' => $this->region,

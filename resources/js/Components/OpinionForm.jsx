@@ -1,5 +1,5 @@
-import React, { useState } from "react";
 import { Inertia } from "@inertiajs/inertia";
+import React, { useState } from "react";
 
 export default function OpinionForm() {
     const [form, setForm] = useState({
@@ -9,73 +9,73 @@ export default function OpinionForm() {
         rating: "",
     });
     const [success, setSuccess] = useState(false);
-    const [error, setError] = useState("");
+    const [error, setError] = useState(""); // Para manejar los errores
 
-    // Función para manejar cambios en el formulario
+    // Función para establecer la cookie
+    const setCookie = (name, value, maxAge) => {
+        document.cookie = `${name}=${value}; max-age=${maxAge}; path=/; Secure; SameSite=Strict`;
+    };
+
     const handleChange = (event) => {
         const { name, value } = event.target;
         setForm((prevForm) => ({ ...prevForm, [name]: value }));
     };
 
-    // Función para establecer una cookie
-    const setCookie = (name, value, maxAge) => {
-        document.cookie = `${name}=${value}; max-age=${maxAge}; path=/; Secure; SameSite=Strict`;
-    };
-
-    // Envío del formulario
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validar campos
-        if (!form.message.trim()) {
+        // Validar si el campo "message" está vacío
+        if (!form.message) {
             setError("El mensaje es obligatorio.");
             return;
         }
 
-        // Enviar datos usando Inertia
-        Inertia.post(
-            "/opinions",
-            {
+        try {
+            // Enviar la opinión
+            await Inertia.post("/opinions", {
                 ...form,
-                name: form.name || "Anónimo",
-                email: form.email || "Anónimo",
-            },
-            {
-                onSuccess: () => {
-                    setSuccess(true);
-                    setError(""); // Limpiar mensajes de error
-                    setCookie("cookie_opinion", "1", 30 * 24 * 60 * 60); // Guardar cookie
-                    setForm({ name: "", email: "", message: "", rating: "" }); // Reiniciar formulario
-                },
-                onError: (errors) => {
-                    console.error(errors);
-                    setError(
-                        "Hubo un problema al enviar la opinión. Intenta nuevamente."
-                    );
-                },
-            }
-        );
+                name: form.name || "Anónimo", // Establecer "Anónimo" si el nombre está vacío
+            });
+            setSuccess(true);
+            setError(""); // Limpiar mensaje de error en caso de éxito
+
+            // Crear la cookie para no mostrar el modal de opinión otra vez durante 30 días
+            setCookie("cookie_opinion", "1", 30 * 24 * 60 * 60);
+
+            // Limpiar formulario después de enviar
+            setForm({
+                name: "",
+                email: "",
+                message: "",
+                rating: "",
+            });
+        } catch (error) {
+            setError(
+                "Hubo un problema al enviar la opinión. Inténtalo de nuevo."
+            );
+            console.error(error);
+        }
     };
 
     return (
         <div className="container p-3">
-            <h2 className="text-center mb-4">¡Tu opinión es importante!</h2>
+            <h2 className="text-center">Deja tu opinión</h2>
 
-            {/* Mensaje de éxito */}
+            {/* Mostrar mensaje de éxito */}
             {success && (
-                <div className="alert alert-success text-center" role="alert">
-                    ¡Opinión enviada con éxito! 🎉
+                <div className="alert alert-success" role="alert">
+                    ¡Opinión enviada con éxito!
                 </div>
             )}
 
-            {/* Mensaje de error */}
+            {/* Mostrar mensaje de error */}
             {error && (
-                <div className="alert alert-danger text-center" role="alert">
+                <div className="alert alert-danger" role="alert">
                     {error}
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} noValidate>
+            <form onSubmit={handleSubmit}>
                 {/* Campo de Nombre */}
                 <div className="mb-3">
                     <label htmlFor="name" className="form-label">
@@ -88,7 +88,7 @@ export default function OpinionForm() {
                         name="name"
                         value={form.name}
                         onChange={handleChange}
-                        placeholder="Escribe tu nombre o déjalo vacío"
+                        placeholder="Anónimo si se deja vacío"
                     />
                 </div>
 
@@ -104,13 +104,13 @@ export default function OpinionForm() {
                         name="email"
                         value={form.email}
                         onChange={handleChange}
-                        placeholder="ejemplo@correo.com"
+                        placeholder="Tu correo (opcional)"
                     />
                 </div>
 
                 {/* Campo de Mensaje */}
                 <div className="mb-3">
-                    <label htmlFor="message" className="form-label">
+                    <label htmlFor="message" className="form-label text-danger">
                         Mensaje <span className="text-danger">*</span>
                     </label>
                     <textarea
@@ -120,9 +120,11 @@ export default function OpinionForm() {
                         value={form.message}
                         onChange={handleChange}
                         required
-                        placeholder="Escribe tu opinión o sugerencia"
-                        rows="4"
+                        placeholder="Escribe tu mensaje aquí..."
                     ></textarea>
+                    <small className="text-muted">
+                        Este campo es obligatorio.
+                    </small>
                 </div>
 
                 {/* Campo de Valoración */}
@@ -138,13 +140,13 @@ export default function OpinionForm() {
                         value={form.rating}
                         onChange={handleChange}
                         min="1"
-                        max="10"
-                        placeholder="Valor del 1 al 10"
+                        max="5"
+                        placeholder="Del 1 al 5"
                     />
                 </div>
 
                 {/* Botón de Enviar */}
-                <button type="submit" className="btn btn-primary w-100">
+                <button type="submit" className="btn btn-primary">
                     Enviar
                 </button>
             </form>
