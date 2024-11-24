@@ -10,6 +10,9 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\OpinionController;
+use App\Http\Controllers\TranslateController;
+
+Route::post('/translate', [TranslateController::class, 'translate'])->withoutMiddleware('auth:api');
 
 Route::resource('/opinions', OpinionController::class)->only(['store']);
 Route::get('/set-dev', function () {
@@ -30,31 +33,6 @@ Route::get('/', function () {
 
     return resolve(App\Http\Controllers\BeerController::class)->index();
 })->name('home');
-
-
-
-
-
-// Route::get('/', function () {
-//     if (app()->environment('production')) {
-//         return app()->call([App\Http\Controllers\BeerController::class, 'index']);
-//     } else {
-//         return view('coming-soon');
-//     }
-// })->name('home');
-
-
-// Route::get('/', function () {
-//     // Comprobar si estamos en modo de mantenimiento o en un entorno específico
-//     if (!app()->environment('production')) {
-//         // Si está en producción, muestra la vista "coming-soon"
-//         return view('coming-soon');
-//     }
-
-//     // Si no es producción, llama a BeerController
-//     return redirect()->route('beers');
-// });
-// Route::get('/', [BeerController::class, 'index'])->name('beers');
 
 Route::get('/beerlocals', [BeerLocalController::class, 'index'])->name('beerlocals.index');
 Route::get('/beerlocals/locals/{localName}', [LocalController::class, 'show'])->name('local.show');

@@ -7,6 +7,7 @@ import NavButton from "@/Components/NavButton/NavButton";
 import topArrow from "../images/toparrow.svg";
 import BeerCard from "@/Components/BeerCard/BeerCard";
 import OpinionForm from "@/Components/OpinionForm";
+import TranslationWrapper from "@/Wrappers/TranslationWrapper";
 
 export default function Welcome({ auth, beers, types }) {
     // Estados
@@ -14,7 +15,13 @@ export default function Welcome({ auth, beers, types }) {
     const [isOpinionModalOpen, setOpinionModalOpen] = useState(false); // Modal de opinión
     const [filters, setFilters] = useState({ type: "", sortBy: "" }); // Filtros de cervezas
     const [filteredBeers, setFilteredBeers] = useState(beers?.data || []); // Lista filtrada de cervezas
+    const [language, setLanguage] = useState("es"); // Cambiar idioma dinámicamente
+    const [translate, setTranslate] = useState(false); // Estado para controlar si traducir
 
+    const toggleLanguage = (lang) => {
+        setLanguage(lang);
+        setTranslate(true); // Activamos la traducción cuando se cambia el idioma
+    };
     // Función para obtener una cookie
     const getCookie = (name) => {
         const value = `; ${document.cookie}`;
@@ -110,152 +117,169 @@ export default function Welcome({ auth, beers, types }) {
 
     return (
         <>
-            {/* Metadata y Header */}
-            <Head title="WELCOME" />
-            <Header auth={auth} />
+            <div>
+                <button onClick={() => toggleLanguage("en")}>
+                    Traducir al Inglés
+                </button>
+                <button onClick={() => toggleLanguage("es")}>
+                    Traducir al Español
+                </button>
+                <TranslationWrapper language={language} translate={translate}>
+                    {/* Metadata y Header */}
+                    <Head title="WELCOME" />
+                    <Header auth={auth} />
 
-            {/* Main Content */}
-            <main className="container my-4">
-                {/* Modal de Opinión */}
-                <Modal
-                    show={isOpinionModalOpen}
-                    maxWidth="md"
-                    onClose={() => setOpinionModalOpen(false)}
-                >
-                    <OpinionForm onSuccess={handleFeedback} />
-                </Modal>
-                {/* Modal de verificación de edad */}
-                <Modal
-                    show={isModalOpen}
-                    maxWidth="md"
-                    onClose={() => setModalOpen(false)}
-                >
-                    <div className="p-4">
-                        <h5 className="text-xl font-bold mb-2 text-warning">
-                            ¿Eres mayor de edad?
-                        </h5>
-                        <p className="mb-4">
-                            Para acceder a este sitio, necesitas ser mayor de
-                            edad.
-                        </p>
-                        <div className="d-flex justify-content-center gap-3">
-                            <button
-                                className="btn btn-warning text-white"
-                                onClick={handleYes}
-                            >
-                                Sí
-                            </button>
-                            <button
-                                className="btn btn-danger text-white"
-                                onClick={handleNo}
-                            >
-                                No
-                            </button>
-                        </div>
-                    </div>
-                </Modal>
-
-                {/* Hero Section */}
-                <section className="container py-3">
-                    <div className="text-center">
-                        <h1 className="display-4 fw-bold">¡Bienvenido!</h1>
-                        <p className="lead text-muted mt-3">
-                            Descubre y encuentra una gran variedad cervezas.
-                        </p>
-                        <hr className="my-4 mx-auto w-50" />
-                        <p className="lead text-muted mt-3">
-                            Aquí lo tienes, empieza! 🍻👇🏽
-                        </p>
-                    </div>
-                </section>
-
-                {/* Filtros */}
-                <section className="mb-5">
-                    <h2 className="text-xl font-bold mb-3">Filtros</h2>
-                    <div className="row g-2">
-                        {/* Filtro de tipo */}
-                        <div className="col-12 col-md-4">
-                            <select
-                                name="type"
-                                value={filters.type}
-                                onChange={handleFilterChange}
-                                className="form-select"
-                            >
-                                <option value="">Todos los tipos</option>
-                                {types &&
-                                    types.map((type, index) => (
-                                        <option key={index} value={type}>
-                                            {type}
-                                        </option>
-                                    ))}
-                            </select>
-                        </div>
-
-                        {/* Filtro de ordenación */}
-                        <div className="col-12 col-md-4">
-                            <select
-                                name="sortBy"
-                                value={filters.sortBy}
-                                onChange={handleFilterChange}
-                                className="form-select"
-                            >
-                                <option value="">Ordenar por</option>
-                                <option value="name_asc">
-                                    Nombre {`↑`}
-                                </option>{" "}
-                                {/* Flecha hacia arriba */}
-                                <option value="name_desc">
-                                    Nombre {`↓`}
-                                </option>{" "}
-                                {/* Flecha hacia abajo */}
-                                <option value="graduation_asc">
-                                    Graduación{`↓`}
-                                </option>{" "}
-                                {/* Flecha hacia arriba */}
-                                <option value="graduation_desc">
-                                    Graduación {`↑`}
-                                </option>{" "}
-                                {/* Flecha hacia abajo */}
-                            </select>
-                        </div>
-
-                        <div className="col-12 col-md-4 d-flex align-items-center">
-                            <button
-                                onClick={clearFilters}
-                                className="btn btn-secondary w-100"
-                            >
-                                Limpiar filtros
-                            </button>
-                        </div>
-                    </div>
-                </section>
-
-                {/* Lista de Cervezas */}
-                <section>
-                    {filteredBeers.length > 0 ? (
-                        <div className="row row-cols-2 row-cols-md-3 g-4">
-                            {filteredBeers.map((beer) => (
-                                <div key={beer.id} className="col">
-                                    <BeerCard beer={beer} />
+                    {/* Main Content */}
+                    <main className="container my-4">
+                        {/* Modal de Opinión */}
+                        <Modal
+                            show={isOpinionModalOpen}
+                            maxWidth="md"
+                            onClose={() => setOpinionModalOpen(false)}
+                        >
+                            <OpinionForm onSuccess={handleFeedback} />
+                        </Modal>
+                        <Modal
+                            show={isModalOpen}
+                            maxWidth="md"
+                            onClose={() => setModalOpen(false)}
+                        >
+                            <div className="p-4">
+                                <h5 className="text-xl font-bold mb-2 text-warning">
+                                    ¿Eres mayor de edad?
+                                </h5>
+                                <p className="mb-4">
+                                    Para acceder a este sitio, necesitas ser
+                                    mayor de edad.
+                                </p>
+                                <div className="d-flex justify-content-center gap-3">
+                                    <button
+                                        className="btn btn-warning text-white"
+                                        onClick={handleYes}
+                                    >
+                                        Sí
+                                    </button>
+                                    <button
+                                        className="btn btn-danger text-white"
+                                        onClick={handleNo}
+                                    >
+                                        No
+                                    </button>
                                 </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <p className="text-center text-muted">
-                            No hay cervezas que coincidan con los filtros
-                            seleccionados.
-                        </p>
-                    )}
-                </section>
+                            </div>
+                        </Modal>
 
-                {/* Botón Scroll Top */}
-                <NavButton scrollTop={true} className="btn-scroll-top">
-                    <img src={topArrow} alt="Volver arriba" />
-                </NavButton>
-            </main>
+                        {/* Hero Section */}
+                        <section className="container py-3">
+                            <div className="text-center">
+                                <h1 className="display-4 fw-bold">
+                                    ¡Bienvenido!
+                                </h1>
+                                <p className="lead text-muted mt-3">
+                                    Descubre y encuentra una gran variedad
+                                    cervezas.
+                                </p>
+                                <hr className="my-4 mx-auto w-50" />
+                                <p className="lead text-muted mt-3">
+                                    Aquí lo tienes, empieza! 🍻👇🏽
+                                </p>
+                            </div>
+                        </section>
 
-            {/* Footer */}
-            <Footer />
+                        {/* Filtros */}
+                        <section className="mb-5">
+                            <h2 className="text-xl font-bold mb-3">Filtros</h2>
+                            <div className="row g-2">
+                                {/* Filtro de tipo */}
+                                <div className="col-12 col-md-4">
+                                    <select
+                                        name="type"
+                                        value={filters.type}
+                                        onChange={handleFilterChange}
+                                        className="form-select"
+                                    >
+                                        <option value="">
+                                            Todos los tipos
+                                        </option>
+                                        {types &&
+                                            types.map((type, index) => (
+                                                <option
+                                                    key={index}
+                                                    value={type}
+                                                >
+                                                    {type}
+                                                </option>
+                                            ))}
+                                    </select>
+                                </div>
+
+                                {/* Filtro de ordenación */}
+                                <div className="col-12 col-md-4">
+                                    <select
+                                        name="sortBy"
+                                        value={filters.sortBy}
+                                        onChange={handleFilterChange}
+                                        className="form-select"
+                                    >
+                                        <option value="">Ordenar por</option>
+                                        <option value="name_asc">
+                                            Nombre {`↑`}
+                                        </option>{" "}
+                                        {/* Flecha hacia arriba */}
+                                        <option value="name_desc">
+                                            Nombre {`↓`}
+                                        </option>{" "}
+                                        {/* Flecha hacia abajo */}
+                                        <option value="graduation_asc">
+                                            Graduación{`↓`}
+                                        </option>{" "}
+                                        {/* Flecha hacia arriba */}
+                                        <option value="graduation_desc">
+                                            Graduación {`↑`}
+                                        </option>{" "}
+                                        {/* Flecha hacia abajo */}
+                                    </select>
+                                </div>
+
+                                <div className="col-12 col-md-4 d-flex align-items-center">
+                                    <button
+                                        onClick={clearFilters}
+                                        className="btn btn-secondary w-100"
+                                    >
+                                        Limpiar filtros
+                                    </button>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Lista de Cervezas */}
+                        <section>
+                            {filteredBeers.length > 0 ? (
+                                <div className="row row-cols-2 row-cols-md-3 g-4">
+                                    {filteredBeers.map((beer) => (
+                                        <div key={beer.id} className="col">
+                                            <BeerCard beer={beer} />
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-center text-muted">
+                                    No hay cervezas que coincidan con los
+                                    filtros seleccionados.
+                                </p>
+                            )}
+                        </section>
+
+                        {/* Botón Scroll Top */}
+                        <NavButton scrollTop={true} className="btn-scroll-top">
+                            <img src={topArrow} alt="Volver arriba" />
+                        </NavButton>
+                    </main>
+
+                    {/* Footer */}
+                    <Footer />
+                </TranslationWrapper>
+            </div>
         </>
     );
 }
